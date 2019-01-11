@@ -1,19 +1,5 @@
 require 'rails_helper'
 
-RSpec::Matchers.define :expire_in do |timeout|
-  match do |token|
-    decoded = JWTSessions::Token.decode(token).first
-    decoded['exp'].to_i <= (Time.now + timeout).to_i
-  end
-end
-
-RSpec::Matchers.define :match_token_key_value do |key, value|
-  match do |token|
-    decoded = JWTSessions::Token.decode(token).first
-    decoded[key] == value
-  end
-end
-
 RSpec.describe UsersController, type: :controller do
   let(:body) { JSON.parse(response.body)}
 

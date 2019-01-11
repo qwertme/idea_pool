@@ -13,11 +13,4 @@ class UsersController < ApplicationController
   def user_params
     params.permit(:name, :email, :password, :password_confirmation)
   end
-
-  def create_session(user:)
-    session = JWTSessions::Session.new(payload: user.to_payload)
-    tokens = session.login
-    { jwt: tokens[:access], refresh_token: tokens[:refresh] }
-  end
-
 end

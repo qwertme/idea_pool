@@ -5,3 +5,4 @@ JWTSessions.encryption_key = Rails.application.credentials.secret_jwt_encryption
 
 JWTSessions.access_exp_time = 600
 JWTSessions.refresh_exp_time = 600
+JWTSessions.access_header = 'x-access-token'

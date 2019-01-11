@@ -68,3 +68,31 @@ Shoulda::Matchers.configure do |config|
     with.library :rails
   end
 end
+
+RSpec::Matchers.define :expire_in do |timeout|
+  match do |token|
+    decoded = JWTSessions::Token.decode(token).first
+    decoded['exp'].to_i <= (Time.now + timeout).to_i
+  end
+end
+
+RSpec::Matchers.define :match_token_key_value do |key, value|
+  match do |token|
+    decoded = JWTSessions::Token.decode(token).first
+    decoded[key] == value
+  end
+end
+
+RSpec.shared_examples_for 'valid login' do
+  let(:body) { JSON.parse(response.body)}
+  let(:email) { 'jack@mailinator.com' }
+
+  it 'has valid content' do
+    expect(response.status).to eq 201
+    expect(response.content_type).to eq 'application/json; charset=utf-8'
+    expect(body).to have_key('jwt')
+    expect(body).to have_key('refresh_token')
+    expect(body['jwt']).to expire_in(10.minutes)
+    expect(body['jwt']).to match_token_key_value('email', email)
+  end
+end
