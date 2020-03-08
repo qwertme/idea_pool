@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe UsersController, type: :controller do
+RSpec.describe UsersController, type: :request do
   let(:body) { JSON.parse(response.body)}
 
   context '#create' do
@@ -10,7 +10,7 @@ RSpec.describe UsersController, type: :controller do
     let(:body) { JSON.parse(response.body) }
 
     before do
-      post :create, params: user_parameters
+      post users_path, params: user_parameters
     end
 
     it 'creates' do
@@ -39,4 +39,28 @@ RSpec.describe UsersController, type: :controller do
     end
   end
 
+  context '#show' do
+    context 'logged in' do
+      let(:user) { FactoryBot.create(:user) }
+      let(:login) {
+        post login_path, params: { email: user.email, password: 'supersecret' }
+        JSON.parse(response.body)
+      }
+      let(:access_token) { login['jwt'] }
+
+      it 'shows' do
+        get me_path, headers: { 'x-access-token' => access_token }
+
+        expect(response.status).to eq 200
+        expect(body).to have_key('email')
+        expect(body).to have_key('name')
+        expect(body).to have_key('avatar_url')
+      end
+    end
+
+    it 'does not show' do
+      get me_path
+      expect(response.status).to eq 401
+    end
+  end
 end

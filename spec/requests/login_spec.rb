@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe LoginController, type: :controller do
+RSpec.describe LoginController, type: :request do
   let(:password) { 'supersecret'}
   let(:user) { FactoryBot.create(:user, password: 'supersecret', password_confirmation: 'supersecret') }
   let(:login) {
-    post :create, params: { email: user.email, password: password }
+    post login_path, params: { email: user.email, password: password }
     JSON.parse(response.body)
   }
   let(:access_token) { login['jwt'] }
@@ -14,7 +14,7 @@ RSpec.describe LoginController, type: :controller do
     context 'valid user' do
 
       before do
-        post :create, params: { email: user.email, password: password }
+        post login_path, params: { email: user.email, password: password }
       end
 
       context 'wrong password' do
@@ -31,7 +31,7 @@ RSpec.describe LoginController, type: :controller do
     end
 
     it 'no user' do
-      post :create, params: { email: 'nobody@nothere.com', password: 'supersecret' }
+      post login_path, params: { email: 'nobody@nothere.com', password: 'supersecret' }
 
       expect(response.status).to eq 400
     end
@@ -41,12 +41,8 @@ RSpec.describe LoginController, type: :controller do
     context 'logged in' do
       let(:body) { JSON.parse(response.body) }
 
-      before do
-        request.headers['x-access-token'] = access_token
-      end
-
       it 'has valid content' do
-        post :refresh, params: { refresh_token: refresh_token }
+        post refresh_login_path, params: { refresh_token: refresh_token }, headers: { 'x-access-token' => access_token }
 
         expect(response.status).to eq 200
         expect(response.content_type).to eq 'application/json; charset=utf-8'
@@ -60,7 +56,7 @@ RSpec.describe LoginController, type: :controller do
 
     context 'not logged in' do
       it 'unauthorized' do
-        post :refresh, params: { refresh_token: '' }
+        post refresh_login_path, params: { refresh_token: '' }
 
         expect(response.status).to eq 401
       end
@@ -69,16 +65,12 @@ RSpec.describe LoginController, type: :controller do
 
   context '#delete' do
     context 'logged in' do
-      before do
-        request.headers['x-access-token'] = access_token
-      end
-
       it 'success' do
-        delete :destroy, params:{ refresh_token: refresh_token }, format: :json
+        delete login_path, params:{ refresh_token: refresh_token }, headers: { 'x-access-token' => access_token }
 
         expect(response.status).to eq 204
 
-        post :refresh, params: { refresh_token: refresh_token }
+        post refresh_login_path, params: { refresh_token: refresh_token }
 
         expect(response.status).to eq 401
       end

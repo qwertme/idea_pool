@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :authorize_access_request!, except: [:create]
+
   def create
     user = User.new(user_params)
     if user.save
@@ -6,6 +8,10 @@ class UsersController < ApplicationController
     else
       render json:{}, status: 400
     end
+  end
+
+  def show
+    render json: { email: current_user.email, name: current_user.name, avatar_url: current_user.avatar_url }, status: 200
   end
 
   private
