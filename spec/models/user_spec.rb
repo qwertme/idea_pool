@@ -23,4 +23,12 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context '#avatar_url' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:avatar_url) { "http://gravatar.com/avatar/#{Digest::MD5::hexdigest(user.email).downcase}.png?d=mm&s=200" }
+
+    it 'returns gravatar url' do
+      expect(user.avatar_url).to eq avatar_url
+    end
+  end
 end
