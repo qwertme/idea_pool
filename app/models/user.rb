@@ -6,7 +6,7 @@ class User < ApplicationRecord
   has_many :ideas, dependent: :destroy
 
   validates :name, presence: true
-  validates :email, presence: true
+  validates :email, presence: true, uniqueness: true
   validates :password, presence: true
 
   def to_payload

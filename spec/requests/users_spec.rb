@@ -63,4 +63,31 @@ RSpec.describe UsersController, type: :request do
       expect(response.status).to eq 401
     end
   end
+
+  context '#destroy' do
+    context 'logged in' do
+      let(:user) { FactoryBot.create(:user) }
+      let(:login) {
+        post login_path, params: { email: user.email, password: 'supersecret' }
+        JSON.parse(response.body)
+      }
+      let(:access_token) { login['jwt'] }
+
+      it 'destroys' do
+        user
+        expect {
+          delete me_path, headers: { 'x-access-token' => access_token }
+        }.to change {
+          User.count
+        }.by(-1)
+
+        expect(response.status).to eq 204
+      end
+    end
+
+    it 'does not delete' do
+      delete me_path
+      expect(response.status).to eq 401
+    end
+  end
 end

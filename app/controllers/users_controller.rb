@@ -14,6 +14,11 @@ class UsersController < ApplicationController
     render json: { email: current_user.email, name: current_user.name, avatar_url: current_user.avatar_url }, status: 200
   end
 
+  def destroy
+    current_user.destroy
+    head :no_content
+  end
+
   private
 
   def user_params
