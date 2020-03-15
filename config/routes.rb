@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   delete 'me', to: 'users#destroy'
 
   resources :ideas
+
+  root to: 'root#index'
 end

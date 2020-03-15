@@ -10,11 +10,35 @@ export default class IdeasApi {
 
     this.events = new EventEmitter()
 
-    this.on = this.events.on.bind(this.events)
-    this.off = this.events.removeListener.bind(this.events)
     this.fetchUserInfo = this.fetchUserInfo.bind(this)
     this.logout = this.logout.bind(this)
     this.handleError = this.handleError.bind(this)
+  }
+
+  saveSession() {
+    if(this.isAuthenticated()) {
+      sessionStorage.setItem('accessToken', this.accessToken)
+      sessionStorage.setItem('refreshToken', this.refreshToken)
+    } else {
+      sessionStorage.removeItem('accessToken')
+      sessionStorage.removeItem('refreshToken')
+    }
+  }
+
+  loadSession() {
+    this.accessToken = sessionStorage.getItem('accessToken')
+    this.refreshToken = sessionStorage.getItem('refreshToken')
+    if(this.isAuthenticated()) {
+      this.fetchUserInfo()
+    }
+  }
+
+  on(event, listener) {
+    this.events.on(event, listener)
+  }
+
+  off(event, listener) {
+    this.events.removeListener(event, listener)
   }
 
   reset() {
