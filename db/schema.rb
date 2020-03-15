@@ -12,13 +12,16 @@
 
 ActiveRecord::Schema.define(version: 2020_03_09_013025) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "ideas", force: :cascade do |t|
     t.string "content"
     t.integer "impact", default: 1
     t.integer "ease", default: 1
     t.integer "confidence", default: 1
     t.float "average_score"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_ideas_on_user_id"

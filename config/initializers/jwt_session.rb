@@ -1,4 +1,8 @@
-JWTSessions.token_store = :memory
+if ENV['REDIS_URL'].nil?
+  JWTSessions.token_store = :memory
+else
+  JWTSessions.token_store = :redis, { redis_url: ENV['REDIS_URL'] }
+end
 
 JWTSessions.algorithm = 'HS256'
 JWTSessions.encryption_key = Rails.application.credentials.secret_jwt_encryption_key
